@@ -1,5 +1,7 @@
 #include "FlecsSubsystem.h"
+
 flecs::world* UFlecsSubsystem::GetEcsWorld() const{return ECSWorld;}
+
 void UFlecsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	OnTickDelegate = FTickerDelegate::CreateUObject(this, &UFlecsSubsystem::Tick);
@@ -13,12 +15,16 @@ void UFlecsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	//flecs explorer and monitor
 	//comment this out if you not using it, it has some performance overhead
 	//go to https://www.flecs.dev/explorer/ when the project is running to inspect active entities and values
+	/*
 	GetEcsWorld()->import<flecs::monitor>();
 	GetEcsWorld()->set<flecs::Rest>({});
+	*/
 	
 	//expose values with names to Flecs Explorer for easier inspection & debugging
+	/*
 	GetEcsWorld()->component<FlecsCorn>().member<float>("Current Growth");
 	GetEcsWorld()->component<FlecsISMIndex>().member<int>("ISM Render index");	
+	*/
 	
 	UE_LOG(LogTemp, Warning, TEXT("UUnrealFlecsSubsystem has started!"));
 	Super::Initialize(Collection);

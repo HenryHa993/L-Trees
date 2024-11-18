@@ -5,6 +5,7 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "FlecsSubsystem.generated.h"
 
+// components
 struct FlecsTransform
 {
 	FTransform Value;
@@ -21,6 +22,8 @@ struct FlecsCorn
 {
 	float Growth;
 };
+
+// tag
 struct Corns {};
 
 USTRUCT(BlueprintType)
@@ -36,6 +39,7 @@ struct FFlecsEntityHandle
 	int FlecsEntityId;
 };
 
+// subsystem exists during game lifetime
 UCLASS()
 class FLECSTEST_API UFlecsSubsystem : public UGameInstanceSubsystem
 {
@@ -51,6 +55,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="FLECS")
 	void InitFlecs(UStaticMesh* InMesh);
+
+	// ufunctions called in script
 	UFUNCTION(BlueprintCallable, Category="FLECS")
 	FFlecsEntityHandle SpawnCornEntity(FVector location, FRotator rotation);
 	UFUNCTION(BlueprintCallable, Category="FLECS")
