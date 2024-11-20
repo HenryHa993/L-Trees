@@ -32,13 +32,23 @@ private:
 	float LineLength;
 	float Angle;
 
+	FString ClearLinesCommand = "FlushPersistentDebugLines";
+
 	void DrawLine(AActor& Actor);
 	void RotatePositive(AActor& Actor);
 	void RotateNegative(AActor& Actor);
 
+	void FlushLines();
+	
 public:
 	UFUNCTION(BlueprintCallable)
 	void Generate();
 
+	UFUNCTION(BlueprintCallable)
+	void GenerateWithIterations(int Iterations);
+
+	UFUNCTION(BlueprintCallable)
+	bool AddRule(FString Input, FString Output);
+	
 	void Draw(AActor& Actor);
 };

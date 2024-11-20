@@ -19,6 +19,8 @@ void ALSystemGeneration::BeginPlay()
 
 	UGameInstance* GameInstance = GetGameInstance();
 	LSystemGenerator = GameInstance->GetSubsystem<ULSystemGeneratorSubsystem>();
+
+	OriginalTransform = GetTransform();
 }
 
 // Called every frame
@@ -29,7 +31,8 @@ void ALSystemGeneration::Tick(float DeltaTime)
 
 void ALSystemGeneration::Draw()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Draw"));
+	//GetWorld()->debug
+	SetActorTransform(OriginalTransform);
 	LSystemGenerator->Draw(*this);
 }
 

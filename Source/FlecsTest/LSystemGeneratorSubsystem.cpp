@@ -12,28 +12,24 @@ ULSystemGeneratorSubsystem::ULSystemGeneratorSubsystem() :
 	
 }
 
+/*Initialise subsystem with some default values.*/
 void ULSystemGeneratorSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	// TODO: Generate() should have a axiom passed in as well as an iterations number
-	Axiom = "F";
+	/*Axiom = "F";
 	CurrentString = Axiom;
 	
 	Rules.Add('F', "F[+F]F[-F][F]");
-	//Rules.Add('0', "1[0]0");
 
 	Angle = 25.7f;
 	
-	Generate();
-	Generate();
-	Generate();
-	Generate();
-	Generate();
+	GenerateWithIterations(6);
 
 	TurtleFunctions.Add('F', FunctionType::Line);
 	TurtleFunctions.Add('+', FunctionType::RotatePositive);
 	TurtleFunctions.Add('-', FunctionType::RotateNegative);
 	TurtleFunctions.Add('[', FunctionType::Cache);
-	TurtleFunctions.Add(']', FunctionType::ReturnCache);
+	TurtleFunctions.Add(']', FunctionType::ReturnCache);*/
 	
 	Super::Initialize(Collection);
 }
@@ -43,38 +39,43 @@ void ULSystemGeneratorSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
+/*Draw straight line with a specified length.*/
 void ULSystemGeneratorSubsystem::DrawLine(AActor& Actor)
 {
 	FTransform ActorTransform = Actor.GetTransform();
-	
 	FVector StartPosition = ActorTransform.GetLocation();
 	//UE_LOG(LogTemp, Warning, TEXT("Start Position: %s"), *StartPosition.ToString());
-
 	FVector UpVector = ActorTransform.GetRotation().GetUpVector();
 	//UE_LOG(LogTemp, Warning, TEXT("Forward Direction: %s"), *ForwardVector.ToString());
-
 	FVector EndPosition = StartPosition + (UpVector * LineLength);
 	//UE_LOG(LogTemp, Warning, TEXT("End Position: %s"), *EndPosition.ToString());
 
 	Actor.SetActorLocation(EndPosition);
-
-	//GetWorld()->LineTraceSingleByChannel()
 	
 	DrawDebugLine(GetWorld(), StartPosition, EndPosition, FColor::Black, true, -1, 0, 5);
 }
 
+/*Apply positive rotation.*/
 void ULSystemGeneratorSubsystem::RotatePositive(AActor& Actor)
 {
 	FRotator AppliedRotation(0,0,Angle);
 	Actor.AddActorWorldRotation(AppliedRotation);
 }
 
+/*Apply negative rotation.*/
 void ULSystemGeneratorSubsystem::RotateNegative(AActor& Actor)
 {
 	FRotator AppliedRotation(0,0,-Angle);
 	Actor.AddActorWorldRotation(AppliedRotation);
 }
 
+/*Remove all lines. Used to re-draw trees.*/
+void ULSystemGeneratorSubsystem::FlushLines()
+{
+	GetWorld()->Exec(GetWorld(), *ClearLinesCommand);
+}
+
+/*Single generation, carries on from previous iteration.*/
 void ULSystemGeneratorSubsystem::Generate()
 {
 	FString NewString = "";
@@ -97,8 +98,53 @@ void ULSystemGeneratorSubsystem::Generate()
 	UE_LOG(LogTemp, Warning, TEXT("New string:%s"), *CurrentString);
 }
 
+/*Generate with a specific set of iterations.*/
+void ULSystemGeneratorSubsystem::GenerateWithIterations(int Iterations)
+{
+	for(int i = 0; i < Iterations; i++)
+	{
+		Generate();
+	}
+}
+
+bool ULSystemGeneratorSubsystem::AddRule(FString Input, FString Output)
+{
+	/*if(Input.IsEmpty())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Input empty."));
+		return false;
+	}
+	if(1 < Input.Len())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Input too long."));
+		return false;
+	}
+	if(Output.IsEmpty())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Output empty.."));
+		return false;
+	}*/
+
+	// Only accept single characters as variables.
+	if(Input.IsEmpty() || 1 < Input.Len() || Output.IsEmpty())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Invalid Rule Insertion."));
+		return false;
+	}
+	
+	TArray<TCHAR> CharArray = Input.GetCharArray();
+
+	Rules.Add(CharArray[0], Output);
+	UE_LOG(LogTemp, Warning, TEXT("Added rule: %s -> %s"), *Input, *Output);
+	return true;
+}
+
+/*Draw current generation.*/
+// TODO: Animation mode using latent actions.
 void ULSystemGeneratorSubsystem::Draw(AActor& Actor)
 {
+	FlushLines();
+
 	TArray<TCHAR> CharacterArray = CurrentString.GetCharArray();
 
 	for(TCHAR CurrentCharacter : CharacterArray)
@@ -112,6 +158,8 @@ void ULSystemGeneratorSubsystem::Draw(AActor& Actor)
 
 		switch (TurtleFunction)
 		{
+		default:
+			break;
 		case FunctionType::Line:
 			DrawLine(Actor);
 			break;
