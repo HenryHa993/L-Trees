@@ -107,9 +107,17 @@ void ULSystemGeneratorSubsystem::GenerateWithIterations(int Iterations)
 	}
 }
 
+void ULSystemGeneratorSubsystem::SetDefaults(FString Axiom, float Angle, float LineLength)
+{
+	this->Axiom = Axiom;
+	CurrentString = this->Axiom;
+	this->Angle = Angle;
+	this->LineLength = LineLength;
+}
+
 bool ULSystemGeneratorSubsystem::AddRule(FString Input, FString Output)
 {
-	/*if(Input.IsEmpty())
+	if(Input.IsEmpty())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Input empty."));
 		return false;
@@ -123,19 +131,33 @@ bool ULSystemGeneratorSubsystem::AddRule(FString Input, FString Output)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Output empty.."));
 		return false;
-	}*/
+	}
 
 	// Only accept single characters as variables.
-	if(Input.IsEmpty() || 1 < Input.Len() || Output.IsEmpty())
+	/*if(Input.IsEmpty() || 1 < Input.Len() || Output.IsEmpty())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Invalid Rule Insertion."));
 		return false;
-	}
+	}*/
 	
 	TArray<TCHAR> CharArray = Input.GetCharArray();
 
 	Rules.Add(CharArray[0], Output);
 	UE_LOG(LogTemp, Warning, TEXT("Added rule: %s -> %s"), *Input, *Output);
+	return true;
+}
+
+bool ULSystemGeneratorSubsystem::AddFunction(FString Input, FunctionType TurtleFunction)
+{
+	if(Input.IsEmpty() || 1 < Input.Len())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Invalid Function Insertion."));
+		return false;
+	}
+	
+	TArray<TCHAR> CharArray = Input.GetCharArray();
+	TurtleFunctions.Add(CharArray[0], TurtleFunction);
+	UE_LOG(LogTemp, Warning, TEXT("Added function: %s"), *Input);
 	return true;
 }
 

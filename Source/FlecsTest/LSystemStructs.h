@@ -10,7 +10,8 @@ struct FSymbols
 	TCHAR Symbol;
 };*/
 
-enum class FunctionType
+UENUM(BlueprintType)
+enum FunctionType
 {
 	Line,
 	RotatePositive,
