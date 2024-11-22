@@ -75,6 +75,16 @@ void ULSystemGeneratorSubsystem::FlushLines()
 	GetWorld()->Exec(GetWorld(), *ClearLinesCommand);
 }
 
+void ULSystemGeneratorSubsystem::ResetFunctions()
+{
+	TurtleFunctions.Empty();
+}
+
+void ULSystemGeneratorSubsystem::ResetRules()
+{
+	Rules.Empty();
+}
+
 /*Single generation, carries on from previous iteration.*/
 void ULSystemGeneratorSubsystem::Generate()
 {
@@ -107,12 +117,12 @@ void ULSystemGeneratorSubsystem::GenerateWithIterations(int Iterations)
 	}
 }
 
-void ULSystemGeneratorSubsystem::SetDefaults(FString Axiom, float Angle, float LineLength)
+void ULSystemGeneratorSubsystem::SetDefaults(FString UserAxiom, float UserAngle, float UserLineLength)
 {
-	this->Axiom = Axiom;
-	CurrentString = this->Axiom;
-	this->Angle = Angle;
-	this->LineLength = LineLength;
+	Axiom = UserAxiom;
+	CurrentString = Axiom;
+	Angle = UserAngle;
+	LineLength = UserLineLength;
 }
 
 bool ULSystemGeneratorSubsystem::AddRule(FString Input, FString Output)

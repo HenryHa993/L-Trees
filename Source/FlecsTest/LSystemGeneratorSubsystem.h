@@ -48,13 +48,19 @@ public:
 	void GenerateWithIterations(int Iterations);
 
 	UFUNCTION(BlueprintCallable)
-	void SetDefaults(FString Axiom, float Angle, float LineLength);
+	void SetDefaults(FString UserAxiom, float UserAngle, float UserLineLength);
 
 	UFUNCTION(BlueprintCallable)
 	bool AddRule(FString Input, FString Output);
 
 	UFUNCTION(BlueprintCallable)
 	bool AddFunction(FString Input, FunctionType TurtleFunction);
+
+	UFUNCTION(BlueprintCallable)
+	void ResetFunctions();
+
+	UFUNCTION(BlueprintCallable)
+	void ResetRules();
 	
 	void Draw(AActor& Actor);
 };
