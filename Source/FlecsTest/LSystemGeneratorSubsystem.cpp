@@ -3,10 +3,14 @@
 
 #include "LSystemGeneratorSubsystem.h"
 
+#include "LSystemGeneration.h"
+#include "Kismet/GameplayStatics.h"
+
 ULSystemGeneratorSubsystem::ULSystemGeneratorSubsystem() :
 	Axiom("0"),
 	CurrentString(Axiom),
 	LineLength(50.0f),
+	LineThickness(3.0f),
 	Angle(90.0f)
 {
 	
@@ -15,22 +19,6 @@ ULSystemGeneratorSubsystem::ULSystemGeneratorSubsystem() :
 /*Initialise subsystem with some default values.*/
 void ULSystemGeneratorSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
-	// TODO: Generate() should have a axiom passed in as well as an iterations number
-	/*Axiom = "F";
-	CurrentString = Axiom;
-	
-	Rules.Add('F', "F[+F]F[-F][F]");
-
-	Angle = 25.7f;
-	
-	GenerateWithIterations(6);
-
-	TurtleFunctions.Add('F', FunctionType::Line);
-	TurtleFunctions.Add('+', FunctionType::RotatePositive);
-	TurtleFunctions.Add('-', FunctionType::RotateNegative);
-	TurtleFunctions.Add('[', FunctionType::Cache);
-	TurtleFunctions.Add(']', FunctionType::ReturnCache);*/
-	
 	Super::Initialize(Collection);
 }
 
@@ -44,29 +32,70 @@ void ULSystemGeneratorSubsystem::DrawLine(AActor& Actor)
 {
 	FTransform ActorTransform = Actor.GetTransform();
 	FVector StartPosition = ActorTransform.GetLocation();
-	//UE_LOG(LogTemp, Warning, TEXT("Start Position: %s"), *StartPosition.ToString());
-	FVector UpVector = ActorTransform.GetRotation().GetUpVector();
-	//UE_LOG(LogTemp, Warning, TEXT("Forward Direction: %s"), *ForwardVector.ToString());
+	/*FVector UpVector = ActorTransform.GetRotation().GetUpVector();
+	FVector EndPosition = StartPosition + (UpVector * LineLength);*/
+	FVector UpVector = ActorTransform.GetRotation().GetForwardVector();
 	FVector EndPosition = StartPosition + (UpVector * LineLength);
-	//UE_LOG(LogTemp, Warning, TEXT("End Position: %s"), *EndPosition.ToString());
 
 	Actor.SetActorLocation(EndPosition);
 	
-	DrawDebugLine(GetWorld(), StartPosition, EndPosition, FColor::Black, true, -1, 0, 5);
+	DrawDebugLine(GetWorld(), StartPosition, EndPosition, FColor::Black, true, -1, 0, LineThickness);
 }
 
+// X
 /*Apply positive rotation.*/
-void ULSystemGeneratorSubsystem::RotatePositive(AActor& Actor)
+void ULSystemGeneratorSubsystem::RotatePositiveRoll(AActor& Actor)
 {
 	FRotator AppliedRotation(0,0,Angle);
-	Actor.AddActorWorldRotation(AppliedRotation);
+	//FRotator AppliedRotation(0,Angle,0);
+	//Actor.AddActorWorldRotation(AppliedRotation);
+	Actor.AddActorLocalRotation(AppliedRotation);
 }
 
 /*Apply negative rotation.*/
-void ULSystemGeneratorSubsystem::RotateNegative(AActor& Actor)
+void ULSystemGeneratorSubsystem::RotateNegativeRoll(AActor& Actor)
 {
 	FRotator AppliedRotation(0,0,-Angle);
-	Actor.AddActorWorldRotation(AppliedRotation);
+	//FRotator AppliedRotation(0,-Angle,0);
+	//Actor.AddActorWorldRotation(AppliedRotation);
+	Actor.AddActorLocalRotation(AppliedRotation);
+}
+
+// Z
+void ULSystemGeneratorSubsystem::RotatePositiveYaw(AActor& Actor)
+{
+	FRotator AppliedRotation(0,Angle,0);
+	//FRotator AppliedRotation(0,0,Angle);
+	//Actor.AddActorWorldRotation(AppliedRotation);
+	Actor.AddActorLocalRotation(AppliedRotation);
+
+}
+
+void ULSystemGeneratorSubsystem::RotateNegativeYaw(AActor& Actor)
+{
+	FRotator AppliedRotation(0,-Angle,0);
+	//FRotator AppliedRotation(0,0,-Angle);
+	//Actor.AddActorWorldRotation(AppliedRotation);
+	Actor.AddActorLocalRotation(AppliedRotation);
+}
+
+// Y
+void ULSystemGeneratorSubsystem::RotatePositivePitch(AActor& Actor)
+{
+	FRotator AppliedRotation(Angle,0,0);
+	//FRotator AppliedRotation(-Angle,0,0);
+	//Actor.AddActorWorldRotation(AppliedRotation);
+	Actor.AddActorLocalRotation(AppliedRotation);
+
+}
+
+void ULSystemGeneratorSubsystem::RotateNegativePitch(AActor& Actor)
+{
+	FRotator AppliedRotation(-Angle,0,0);
+	//FRotator AppliedRotation(Angle,0,0);
+	//Actor.AddActorWorldRotation(AppliedRotation);
+	Actor.AddActorLocalRotation(AppliedRotation);
+
 }
 
 /*Remove all lines. Used to re-draw trees.*/
@@ -75,11 +104,13 @@ void ULSystemGeneratorSubsystem::FlushLines()
 	GetWorld()->Exec(GetWorld(), *ClearLinesCommand);
 }
 
+/*Clear all functions from map.*/
 void ULSystemGeneratorSubsystem::ResetFunctions()
 {
 	TurtleFunctions.Empty();
 }
 
+/*Clear all rules from map.*/
 void ULSystemGeneratorSubsystem::ResetRules()
 {
 	Rules.Empty();
@@ -91,7 +122,8 @@ void ULSystemGeneratorSubsystem::Generate()
 	FString NewString = "";
 	TArray<TCHAR> CharacterArray = CurrentString.GetCharArray();
 	//UE_LOG(LogTemp, Warning, TEXT("Current string: %s"), *CurrentString);
-	 
+
+	// If Character is variable in a rule, replace it with output
 	for(int32 i = 0; i < CharacterArray.Num(); i++)
 	{
 		TCHAR CurrentCharacter = CharacterArray[i];
@@ -101,6 +133,7 @@ void ULSystemGeneratorSubsystem::Generate()
 			continue;
 		}
 
+		// Otherwise add it back to string
 		NewString += CurrentCharacter;
 	}
 
@@ -115,16 +148,21 @@ void ULSystemGeneratorSubsystem::GenerateWithIterations(int Iterations)
 	{
 		Generate();
 	}
+
+	OnGenerateDelegate.Broadcast();
 }
 
-void ULSystemGeneratorSubsystem::SetDefaults(FString UserAxiom, float UserAngle, float UserLineLength)
+/*Allows passing l-system values through blueprints.*/
+void ULSystemGeneratorSubsystem::SetDefaults(FString UserAxiom, float UserAngle, float UserLineLength, float UserLineThickness)
 {
 	Axiom = UserAxiom;
 	CurrentString = Axiom;
 	Angle = UserAngle;
 	LineLength = UserLineLength;
+	LineThickness = UserLineThickness;
 }
 
+/*Add a rule from blueprints.*/
 bool ULSystemGeneratorSubsystem::AddRule(FString Input, FString Output)
 {
 	if(Input.IsEmpty())
@@ -142,13 +180,6 @@ bool ULSystemGeneratorSubsystem::AddRule(FString Input, FString Output)
 		UE_LOG(LogTemp, Warning, TEXT("Output empty.."));
 		return false;
 	}
-
-	// Only accept single characters as variables.
-	/*if(Input.IsEmpty() || 1 < Input.Len() || Output.IsEmpty())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Invalid Rule Insertion."));
-		return false;
-	}*/
 	
 	TArray<TCHAR> CharArray = Input.GetCharArray();
 
@@ -157,6 +188,7 @@ bool ULSystemGeneratorSubsystem::AddRule(FString Input, FString Output)
 	return true;
 }
 
+/*Add function from blueprints.*/
 bool ULSystemGeneratorSubsystem::AddFunction(FString Input, FunctionType TurtleFunction)
 {
 	if(Input.IsEmpty() || 1 < Input.Len())
@@ -195,17 +227,29 @@ void ULSystemGeneratorSubsystem::Draw(AActor& Actor)
 		case FunctionType::Line:
 			DrawLine(Actor);
 			break;
-		case FunctionType::RotatePositive:
-			RotatePositive(Actor);
+		case FunctionType::RotatePositiveRoll:
+			RotatePositiveRoll(Actor);
 			break;
-		case FunctionType::RotateNegative:
-			RotateNegative(Actor);
+		case FunctionType::RotateNegativeRoll:
+			RotateNegativeRoll(Actor);
 			break;
 		case FunctionType::Cache:
 			TransformStack.Push(Actor.GetTransform());
 			break;
 		case FunctionType::ReturnCache:
 			Actor.SetActorTransform(TransformStack.Pop());
+			break;
+		case FunctionType::RotatePositiveYaw:
+			RotatePositiveYaw(Actor);
+			break;
+		case FunctionType::RotateNegativeYaw:
+			RotateNegativeYaw(Actor);
+			break;
+		case FunctionType::RotatePositivePitch:
+			RotatePositivePitch(Actor);
+			break;
+		case FunctionType::RotateNegativePitch:
+			RotateNegativePitch(Actor);
 			break;
 		}
 	}

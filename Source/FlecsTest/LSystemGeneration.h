@@ -7,7 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "LSystemGeneration.generated.h"
 
-/*LSystemGeneration is responsible for drawing the tree.*/
+/*LSystemGeneration is responsible for drawing the tree to a specific location.*/
 UCLASS()
 class FLECSTEST_API ALSystemGeneration : public AActor
 {

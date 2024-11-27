@@ -1,21 +1,16 @@
 #pragma once
 #include "CoreMinimal.h"
-/*#include "LSystemStructs.generated.h"
-
-USTRUCT(BlueprintType)
-struct FSymbols
-{
-	GENERATED_BODY()
-	
-	TCHAR Symbol;
-};*/
 
 UENUM(BlueprintType)
 enum FunctionType
 {
 	Line,
-	RotatePositive,
-	RotateNegative,
+	RotatePositiveRoll,
+	RotateNegativeRoll,
 	Cache,
-	ReturnCache
+	ReturnCache,
+	RotatePositiveYaw,
+	RotateNegativeYaw,
+	RotatePositivePitch,
+	RotateNegativePitch
 };

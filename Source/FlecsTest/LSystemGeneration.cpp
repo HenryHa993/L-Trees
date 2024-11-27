@@ -21,6 +21,7 @@ void ALSystemGeneration::BeginPlay()
 	LSystemGenerator = GameInstance->GetSubsystem<ULSystemGeneratorSubsystem>();
 
 	OriginalTransform = GetTransform();
+	LSystemGenerator->OnGenerateDelegate.AddUniqueDynamic(this, &ALSystemGeneration::Draw);
 }
 
 // Called every frame
@@ -35,10 +36,3 @@ void ALSystemGeneration::Draw()
 	SetActorTransform(OriginalTransform);
 	LSystemGenerator->Draw(*this);
 }
-
-/*Draw the generation*/
-/*void ALSystemGeneration::Draw(FString GenerationString)
-{
-	
-}*/
-

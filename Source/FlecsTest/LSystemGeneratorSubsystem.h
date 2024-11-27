@@ -7,6 +7,8 @@
 #include "LSystemStructs.h"
 #include "LSystemGeneratorSubsystem.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGenerateSignature);
+
 /**
  * 
  */
@@ -30,17 +32,25 @@ private:
 	TArray<FTransform> TransformStack;
 
 	float LineLength;
+	float LineThickness;
 	float Angle;
 
 	FString ClearLinesCommand = "FlushPersistentDebugLines";
 
 	void DrawLine(AActor& Actor);
-	void RotatePositive(AActor& Actor);
-	void RotateNegative(AActor& Actor);
+	void RotatePositiveRoll(AActor& Actor);
+	void RotateNegativeRoll(AActor& Actor);
+	void RotatePositiveYaw(AActor& Actor);
+	void RotateNegativeYaw(AActor& Actor);
+	void RotatePositivePitch(AActor& Actor);
+	void RotateNegativePitch(AActor& Actor);
 
 	void FlushLines();
 	
 public:
+	UPROPERTY(BlueprintAssignable)
+	FOnGenerateSignature OnGenerateDelegate;
+	
 	UFUNCTION(BlueprintCallable)
 	void Generate();
 
@@ -48,7 +58,7 @@ public:
 	void GenerateWithIterations(int Iterations);
 
 	UFUNCTION(BlueprintCallable)
-	void SetDefaults(FString UserAxiom, float UserAngle, float UserLineLength);
+	void SetDefaults(FString UserAxiom, float UserAngle, float UserLineLength, float UserLineThickness);
 
 	UFUNCTION(BlueprintCallable)
 	bool AddRule(FString Input, FString Output);
