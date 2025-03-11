@@ -28,12 +28,10 @@ void ULSystemGeneratorSubsystem::Deinitialize()
 }
 
 /*Draw straight line with a specified length.*/
-void ULSystemGeneratorSubsystem::DrawLine(AActor& Actor)
+void ULSystemGeneratorSubsystem::DrawLine(AActor& Actor) const
 {
 	FTransform ActorTransform = Actor.GetTransform();
 	FVector StartPosition = ActorTransform.GetLocation();
-	/*FVector UpVector = ActorTransform.GetRotation().GetUpVector();
-	FVector EndPosition = StartPosition + (UpVector * LineLength);*/
 	FVector UpVector = ActorTransform.GetRotation().GetForwardVector();
 	FVector EndPosition = StartPosition + (UpVector * LineLength);
 
@@ -44,62 +42,50 @@ void ULSystemGeneratorSubsystem::DrawLine(AActor& Actor)
 
 // X
 /*Apply positive rotation.*/
-void ULSystemGeneratorSubsystem::RotatePositiveRoll(AActor& Actor)
+void ULSystemGeneratorSubsystem::RotatePositiveRoll(AActor& Actor) const
 {
 	FRotator AppliedRotation(0,0,Angle);
-	//FRotator AppliedRotation(0,Angle,0);
-	//Actor.AddActorWorldRotation(AppliedRotation);
 	Actor.AddActorLocalRotation(AppliedRotation);
 }
 
 /*Apply negative rotation.*/
-void ULSystemGeneratorSubsystem::RotateNegativeRoll(AActor& Actor)
+void ULSystemGeneratorSubsystem::RotateNegativeRoll(AActor& Actor) const
 {
 	FRotator AppliedRotation(0,0,-Angle);
-	//FRotator AppliedRotation(0,-Angle,0);
-	//Actor.AddActorWorldRotation(AppliedRotation);
 	Actor.AddActorLocalRotation(AppliedRotation);
 }
 
 // Z
-void ULSystemGeneratorSubsystem::RotatePositiveYaw(AActor& Actor)
+void ULSystemGeneratorSubsystem::RotatePositiveYaw(AActor& Actor) const
 {
 	FRotator AppliedRotation(0,Angle,0);
-	//FRotator AppliedRotation(0,0,Angle);
-	//Actor.AddActorWorldRotation(AppliedRotation);
 	Actor.AddActorLocalRotation(AppliedRotation);
 
 }
 
-void ULSystemGeneratorSubsystem::RotateNegativeYaw(AActor& Actor)
+void ULSystemGeneratorSubsystem::RotateNegativeYaw(AActor& Actor) const
 {
 	FRotator AppliedRotation(0,-Angle,0);
-	//FRotator AppliedRotation(0,0,-Angle);
-	//Actor.AddActorWorldRotation(AppliedRotation);
 	Actor.AddActorLocalRotation(AppliedRotation);
 }
 
 // Y
-void ULSystemGeneratorSubsystem::RotatePositivePitch(AActor& Actor)
+void ULSystemGeneratorSubsystem::RotatePositivePitch(AActor& Actor) const
 {
 	FRotator AppliedRotation(Angle,0,0);
-	//FRotator AppliedRotation(-Angle,0,0);
-	//Actor.AddActorWorldRotation(AppliedRotation);
 	Actor.AddActorLocalRotation(AppliedRotation);
 
 }
 
-void ULSystemGeneratorSubsystem::RotateNegativePitch(AActor& Actor)
+void ULSystemGeneratorSubsystem::RotateNegativePitch(AActor& Actor) const
 {
 	FRotator AppliedRotation(-Angle,0,0);
-	//FRotator AppliedRotation(Angle,0,0);
-	//Actor.AddActorWorldRotation(AppliedRotation);
 	Actor.AddActorLocalRotation(AppliedRotation);
 
 }
 
 /*Remove all lines. Used to re-draw trees.*/
-void ULSystemGeneratorSubsystem::FlushLines()
+void ULSystemGeneratorSubsystem::FlushLines() const
 {
 	GetWorld()->Exec(GetWorld(), *ClearLinesCommand);
 }

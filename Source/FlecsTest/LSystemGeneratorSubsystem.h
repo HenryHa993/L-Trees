@@ -37,15 +37,15 @@ private:
 
 	FString ClearLinesCommand = "FlushPersistentDebugLines";
 
-	void DrawLine(AActor& Actor);
-	void RotatePositiveRoll(AActor& Actor);
-	void RotateNegativeRoll(AActor& Actor);
-	void RotatePositiveYaw(AActor& Actor);
-	void RotateNegativeYaw(AActor& Actor);
-	void RotatePositivePitch(AActor& Actor);
-	void RotateNegativePitch(AActor& Actor);
+	void DrawLine(AActor& Actor) const;
+	void RotatePositiveRoll(AActor& Actor) const;
+	void RotateNegativeRoll(AActor& Actor) const;
+	void RotatePositiveYaw(AActor& Actor) const;
+	void RotateNegativeYaw(AActor& Actor) const;
+	void RotatePositivePitch(AActor& Actor) const;
+	void RotateNegativePitch(AActor& Actor) const;
 
-	void FlushLines();
+	void FlushLines() const;
 	
 public:
 	UPROPERTY(BlueprintAssignable)
